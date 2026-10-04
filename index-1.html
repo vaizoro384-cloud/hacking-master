@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hacking Master - Gaming Market</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:#fff}
+header{padding:24px 16px;text-align:center;background:#111936;border-bottom:1px solid #26345f}
+.container{width:min(1000px,92%);margin:24px auto}.panel,.card{background:#111936;border:1px solid #26345f;border-radius:16px;padding:18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+input,textarea{width:100%;padding:12px;margin:7px 0 12px;border-radius:9px;border:1px solid #33436f;background:#0b1020;color:#fff}
+button{border:0;padding:11px 15px;border-radius:9px;cursor:pointer;font-weight:bold;background:#5865f2;color:#fff;margin:3px}
+.delete{background:#d33}.edit{background:#666}.price{font-size:20px;font-weight:bold;margin:10px 0}
+#adminForm{display:none}.muted{color:#aab5d6}
+</style>
+</head>
+<body>
+<header><h1>🎮 Hacking Master</h1><div class="muted">Gaming Marketplace</div></header>
+<div class="container">
+<div class="panel"><input id="search" placeholder="🔎 Product খুঁজুন..."></div>
+<div class="panel">
+<button onclick="toggleAdmin()">⚙️ Admin Panel</button>
+<div id="adminForm">
+<h2 id="title">➕ Product যোগ করুন</h2>
+<input id="name" placeholder="Product নাম">
+<input id="price" placeholder="দাম">
+<input id="image" placeholder="Image URL">
+<textarea id="desc" placeholder="Description"></textarea>
+<button onclick="save()">💾 Save</button><button class="edit" onclick="cancelEdit()">Cancel</button>
+</div></div>
+<h2>🛍️ Products</h2><div id="products" class="grid"></div>
+</div>
+<script>
+let products=[
+{id:1,name:"Gaming Coaching",price:"৳500",image:"",desc:"১ ঘণ্টার gaming coaching service।"},
+{id:2,name:"Custom HUD Setup",price:"৳200",image:"",desc:"তোমার gameplay অনুযায়ী HUD setup।"}
+],editing=null;
+const $=id=>document.getElementById(id);
+function esc(x){return String(x).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function render(){let q=$("search").value.toLowerCase();$("products").innerHTML="";
+products.filter(p=>(p.name+" "+p.desc).toLowerCase().includes(q)).forEach(p=>{
+let c=document.createElement("div");c.className="card";
+c.innerHTML=(p.image?`<img src="${esc(p.image)}" style="width:100%;height:150px;object-fit:cover;border-radius:10px">`:"")+
+`<h3>${esc(p.name)}</h3><div class="price">${esc(p.price)}</div><p class="muted">${esc(p.desc)}</p>
+<button onclick="order(${p.id})">🛒 Order</button><button class="edit" onclick="edit(${p.id})">✏️ Edit</button><button class="delete" onclick="del(${p.id})">🗑️ Delete</button>`;
+$("products").appendChild(c)})}
+function toggleAdmin(){$("adminForm").style.display=$("adminForm").style.display==="block"?"none":"block"}
+function save(){let n=$("name").value.trim(),p=$("price").value.trim();if(!n||!p)return alert("Product নাম ও দাম দিন।");
+let data={name:n,price:p,image:$("image").value.trim(),desc:$("desc").value.trim()};
+if(editing){Object.assign(products.find(x=>x.id===editing),data);editing=null}else products.push({id:Date.now(),...data});clear();render()}
+function edit(id){let p=products.find(x=>x.id===id);editing=id;$("name").value=p.name;$("price").value=p.price;$("image").value=p.image;$("desc").value=p.desc;$("title").textContent="✏️ Product Edit করুন";$("adminForm").style.display="block"}
+function del(id){if(confirm("Product delete করবেন?")){products=products.filter(p=>p.id!==id);render()}}
+function order(id){let p=products.find(x=>x.id===id);alert("Selected: "+p.name+" ("+p.price+")")}
+function clear(){$("name").value=$("price").value=$("image").value=$("desc").value="";$("title").textContent="➕ Product যোগ করুন"}
+function cancelEdit(){editing=null;clear()}
+$("search").addEventListener("input",render);render();
+</script>
+</body>
+</html>
